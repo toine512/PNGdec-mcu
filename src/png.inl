@@ -74,7 +74,7 @@ int PNG_openRAM(PNGIMAGE *pPNG, uint8_t *pData, int iDataSize, PNG_DRAW_CALLBACK
     return PNGInit(pPNG);
 } /* PNG_openRAM() */
 
-#ifdef __LINUX__
+#if defined( __LINUX__ ) || defined( ESP_PLATFORM )
 int PNG_openFile(PNGIMAGE *pPNG, const char *szFilename, PNG_DRAW_CALLBACK *pfnDraw)
 {
     pPNG->iError = PNG_SUCCESS;
@@ -134,7 +134,7 @@ PNG_STATIC uint8_t PNGMakeMask(PNGDRAW *pDraw, uint8_t *pMask, uint8_t ucThresho
     uint8_t alpha, c, *s, *d, *pPal;
     uint8_t cHasOpaque = 0;
     int i, x;
-    
+
     switch (pDraw->iPixelType) {
         case PNG_PIXEL_TRUECOLOR_ALPHA: // truecolor + alpha
             s = pDraw->pPixels;
@@ -229,14 +229,14 @@ PNG_STATIC void PNGRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uin
     int x, j;
     uint16_t usPixel, *pDest = pPixels;
     uint8_t c, a, *pPal, *s = pDraw->pPixels;
-    
+
     switch (pDraw->iPixelType) {
         case PNG_PIXEL_GRAY_ALPHA:
             for (x=0; x<pDraw->iWidth; x++) {
                 c = *s++; // gray level
                 a = *s++;
                 j = (a * c) >> 8; // multiply by the alpha
-                usPixel = usGrayTo565[j]; 
+                usPixel = usGrayTo565[j];
                 if (iEndiannes == PNG_RGB565_BIG_ENDIAN)
                     usPixel = __builtin_bswap16(usPixel);
                 *pDest++ = usPixel;
@@ -313,7 +313,7 @@ PNG_STATIC void PNGRGB565(PNGDRAW *pDraw, uint16_t *pPixels, int iEndiannes, uin
                            }
                        }
                        break;
-               } // switch on bpp 
+               } // switch on bpp
                return;
             }
             switch (pDraw->iBpp) {
@@ -485,7 +485,7 @@ PNG_STATIC int PNGParseInfo(PNGIMAGE *pPage)
 {
     uint8_t *s = pPage->ucFileBuf;
     int iBytesRead;
-    
+
     pPage->iHasAlpha = pPage->iInterlaced = 0;
     // Read a few bytes to just parse the size/pixel info
     iBytesRead = (*pPage->pfnRead)(&pPage->PNGFile, s, 32);
@@ -542,7 +542,7 @@ PNG_STATIC void DeFilter(uint8_t *pCurr, uint8_t *pPrev, int iWidth, int iPitch)
         iBpp = 1;
     else
         iBpp = iPitch / iWidth;
-    
+
     pPrev++; // skip filter of previous line
     switch (ucFilter) { // switch on filter type
         case PNG_FILTER_NONE:
@@ -652,7 +652,7 @@ PNG_STATIC int DecodePNG(PNGIMAGE *pPage, void *pUser, int iOptions)
     z_stream d_stream; /* decompression stream */
     uint8_t *s = pPage->ucFileBuf;
     struct inflate_state *state;
-    
+
     // Either the image buffer must be allocated or a draw callback must be set before entering
     if (pPage->pImage == NULL && pPage->pfnDraw == NULL) {
         pPage->iError = PNG_NO_BUFFER;
@@ -681,7 +681,7 @@ PNG_STATIC int DecodePNG(PNGIMAGE *pPage, void *pUser, int iOptions)
 //    else
 //        err = mz_inflateInit2(&d_stream, 15);
 #endif // FUTURE
-    
+
     iFileOffset = 8; // skip PNG file signature
     iOffset = 0; // internal buffer offset starts at 0
     // Read some data to start

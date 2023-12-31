@@ -21,7 +21,7 @@
 //
 #ifndef __PNGDEC__
 #define __PNGDEC__
-#if defined( __MACH__ ) || defined( __LINUX__ ) || defined( __MCUXPRESSO )
+#if defined( __MACH__ ) || defined( __LINUX__ ) || defined( __MCUXPRESSO ) || defined( ESP_PLATFORM )
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -38,7 +38,7 @@
 // PNG Decoder
 // Written by Larry Bank
 // Copyright (c) 2021 BitBank Software, Inc.
-// 
+//
 // Designed to decode most PNG images (1-32 bpp)
 // using less than 40K of RAM
 //
