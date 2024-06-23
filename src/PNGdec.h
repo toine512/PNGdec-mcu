@@ -50,7 +50,10 @@
 #define PNG_FILE_BUF_SIZE 2048
 // Number of bytes to reserve for current and previous lines
 // Defaults to 480 32-bit pixels max width
-#define PNG_MAX_BUFFERED_PIXELS ((480*4 + 1)*2)
+#ifndef PNG_MAX_LINE_LENGTH
+  #define PNG_MAX_LINE_LENGTH 480
+#endif
+#define PNG_MAX_BUFFERED_PIXELS ((PNG_MAX_LINE_LENGTH*4 + 1)*2)
 // PNG filter type
 enum {
     PNG_FILTER_NONE=0,
